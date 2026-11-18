@@ -1,5 +1,5 @@
---  Minimal SDL2 / SDL2_ttf Ada bindings (window, renderer, events, text).
---  Pure declarations + pragma Import: no C headers needed at compile time.
+--  Minimal SDL2 Ada bindings: init, window, renderer, events, timing,
+--  surfaces/textures. Pure declarations + pragma Import (no C headers).
 with Interfaces.C;
 with System;
 
@@ -116,10 +116,10 @@ package SDL is
    pragma Convention (C, SDL_Keysym);
    for SDL_Keysym'Size use 128;
 
-   --  128-byte SDL_Event union; the keyboard-event fields sit at their
-   --  C offsets so Ev.Keysym is directly readable for KEYDOWN/KEYUP.
    type Uint32_Array_24 is array (1 .. 24) of Uint32;
 
+   --  128-byte SDL_Event union; the keyboard-event fields sit at their
+   --  C offsets so Ev.Keysym is directly readable for KEYDOWN/KEYUP.
    type SDL_Event is record
       EType     : Uint32;
       Timestamp : Uint32;
@@ -143,7 +143,7 @@ package SDL is
    function SDL_GetTicks return Uint32;
    pragma Import (C, SDL_GetTicks, "SDL_GetTicks");
 
-   --  surfaces / textures (for TTF text) ------------------------------------
+   --  surfaces / textures --------------------------------------------------
    type SDL_Surface is null record;
    pragma Convention (C, SDL_Surface);
    type SDL_Surface_Ptr is access all SDL_Surface;
@@ -176,28 +176,5 @@ package SDL is
      (Ren : SDL_Renderer_Ptr; Tex : SDL_Texture_Ptr;
       Src, Dst : access SDL_Rect) return Interfaces.C.int;
    pragma Import (C, SDL_RenderCopy, "SDL_RenderCopy");
-
-   --  SDL2_ttf ---------------------------------------------------------------
-   type TTF_Font is null record;
-   pragma Convention (C, TTF_Font);
-   type TTF_Font_Ptr is access all TTF_Font;
-
-   function TTF_Init return Interfaces.C.int;
-   pragma Import (C, TTF_Init, "TTF_Init");
-
-   procedure TTF_Quit;
-   pragma Import (C, TTF_Quit, "TTF_Quit");
-
-   function TTF_OpenFont
-     (File : Interfaces.C.char_array; PtSize : Interfaces.C.int) return TTF_Font_Ptr;
-   pragma Import (C, TTF_OpenFont, "TTF_OpenFont");
-
-   procedure TTF_CloseFont (Font : TTF_Font_Ptr);
-   pragma Import (C, TTF_CloseFont, "TTF_CloseFont");
-
-   function TTF_RenderUTF8_Solid
-     (Font : TTF_Font_Ptr; Text : Interfaces.C.char_array; Fg : SDL_Color)
-      return SDL_Surface_Ptr;
-   pragma Import (C, TTF_RenderUTF8_Solid, "TTF_RenderUTF8_Solid");
 
 end SDL;
